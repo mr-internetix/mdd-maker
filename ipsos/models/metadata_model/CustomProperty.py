@@ -12,6 +12,7 @@ class CustomProperty:
             sliced_string = text[slice_point:]
             return sliced_string.strip() # strip()
         except Exception as e:
+            print(e)
             return text
     
 
@@ -53,37 +54,44 @@ class CustomProperty:
             
             """
             screening_table_object = self._document ['xml']['mdm:metadata']['definition']['categories'] 
+            all_the_values = None
             
             for values in screening_table_object:
                 if values['@name'] == "ScreeningTableList":
                     try:
                         first_category = values['category'][0]
-                        if first_category['properties']:
+                        if first_category['properties']: 
                             all_the_values = values['category']
                             break
                     except Exception as e:
                         pass
+            if all_the_values is not None:
+                for category in all_the_values:
+                    try:
+                        name = self.slice_string(category.get('labels', {}).get('text', [{}])[0].get('#text',{}))
+                    except Exception as e:
+                        name = self.slice_string(category.get('labels', {}).get('text', [{}]).get('#text',{}))
 
+                    property = None
+                    value = None
+                    try:
+                        property = (category['properties']['property']['@name']).lower()
+                        value = (category['properties']['property']['@value']).lower()    
+                    except Exception as e:
+                        pass
 
-            for category in all_the_values:
-                name = self.slice_string(category.get('labels', {}).get('text', [{}])[0].get('#text',{}))
-                property = None
-                value = None
-                try:
-                    property = (category['properties']['property']['@name']).lower()
-                    value = (category['properties']['property']['@value']).lower()    
-                except Exception as e:
-                    pass
+                    name_of_variables.append(name)
+                    custom_property_.append(property)
+                    custom_property_value.append(value)
 
-                name_of_variables.append(name)
-                custom_property_.append(property)
-                custom_property_value.append(value)
+                return {
+                    'name_of_variables':name_of_variables,
+                            'custom_property':custom_property_,
+                            'custom_property_value':custom_property_value}
 
-            return {
-                'name_of_variables':name_of_variables,
-                        'custom_property':custom_property_,
-                        'custom_property_value':custom_property_value}
-        
+            else:
+                return None 
+                      
 
 
         except Exception as e:

@@ -1459,6 +1459,7 @@ class DDF:
 
         # var_lst = [ var.FullName  for var in self.mdm.VariableInstances ]
         var_lst = [var.FullName for var in self.mdm.VariableInstances if var.IsSystem == False ]
+        # var_lst = [var.FullName for var in self.mdm.VariableInstances if var.IsSystem == True ]
         return var_lst
 
     @ft.lru_cache(maxsize=1)
